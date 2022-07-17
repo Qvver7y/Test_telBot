@@ -24,7 +24,7 @@ class Update_mes:
 
 
     def send_ans(self, method_name,data = None):
-        requests.post(f"https://api.telegram.org/bot{self.token}/{method_name}",data=data,timeout= 1)
+        requests.post(f"https://api.telegram.org/bot{self.token}/{method_name}",data=data)
 
 class Update:
     def __init__(self, res,token):
@@ -39,6 +39,7 @@ class Update:
         
 def get_updates(token, update_id=-1):
     data = {"offset":update_id}
+   # print(f"https://api.telegram.org/bot{token}/getUpdates")
     res = requests.post(f"https://api.telegram.org/bot{token}/getUpdates",data = data ).json()
     return Update(res,token)
 
