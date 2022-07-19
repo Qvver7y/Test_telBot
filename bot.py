@@ -13,13 +13,20 @@ class Update_mes:
     def choose_ans(self):
         if(self.text == "/start"):
             self.startFunc()
+        if(self.text == "/help"):
+            self.helpFunc()
+        if(self.text == "/info"):
+            self.infoFunc()
 
-
-
+    def infoFunc(self):
+        data = {"chat_id": self.chat_id, "text": f"Hi,{self.from_firstName}!!\nThis is just test bot. But maybe it'll become something bigger!!"}
+        self.send_ans("sendMessage",data)
+    def helpFunc(self):
+        data = {"chat_id": self.chat_id, "text": "available commands:\n/start\n/help\n/info"}
+        self.send_ans("sendMessage", data)
     def startFunc(self):
         data = {"chat_id": self.chat_id, "text": "Hello world"}
-        self.send_ans("sendMessage", data)
-        
+        self.send_ans("sendMessage", data)        
 
 
 
@@ -39,7 +46,6 @@ class Update:
         
 def get_updates(token, update_id=-1):
     data = {"offset":update_id}
-   # print(f"https://api.telegram.org/bot{token}/getUpdates")
     res = requests.post(f"https://api.telegram.org/bot{token}/getUpdates",data = data ).json()
     return Update(res,token)
 
@@ -59,12 +65,5 @@ def main():
     while(1):
         update_id = work(update_id, token)
 
-    '''
-    print(f"https://api.telegram.org/bot{token}/getUpdates")
-    res = requests.post(f"https://api.telegram.org/bot{token}/getUpdates",data={"offset":-1},timeout=1).json()
-    print(res)
-    x = Update_mes(res["result"][0])
-    print(1)
-    '''
 if __name__ == "__main__":
         main()
