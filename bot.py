@@ -1,4 +1,22 @@
+import json
 import requests
+from setuptools import Command
+
+
+
+'''
+available commands: /start, /help, /info
+
+
+'''
+
+
+
+#                                   <---------------- classes ---------------->
+
+
+
+
 
 class Update_mes:
     def __init__(self, message,token):
@@ -43,7 +61,18 @@ class Update:
             self.message_mas.append(new_el)
         if(len(self.message_mas) > 0):
             self.updates_id = self.message_mas[-1].update_id + 1 # next update_id (for the next request)        
-        
+
+
+
+
+
+    
+#                               <----------------- functions() ------------------>        
+
+
+
+
+
 def get_updates(token, update_id=-1):
     data = {"offset":update_id}
     res = requests.post(f"https://api.telegram.org/bot{token}/getUpdates",data = data ).json()
@@ -56,12 +85,36 @@ def work(update_id, token):
         i.choose_ans()
     return Updates.updates_id
     
+def send_req(token, method_name,data = None):
+   return requests.post(f"https://api.telegram.org/bot{token}/{method_name}",data=data)
+
+
+def set_commands(token):
+    datahelp = [{"command" : "/start", "description": "press to start bot"} , {"command" : "/help", "description":"bot's commands"}, 
+        {"command" : "/info", "description": "learn more about this bot"}]
+    datahelp = json.dumps(datahelp)
+    data = {"commands" : datahelp}
+    send_req(token, "setMyCommands",data = data )
     
+def bot_config(token):
+    set_commands(token)
+
+
+
+
+
+#                                  <----------------- main() ------------------>
+
+
+
+
+
 def main():
     f = open("token","r")
     token = f.readline()[0:-1]
     f.close()
     update_id = -1
+    bot_config(token)
     while(1):
         update_id = work(update_id, token)
 
