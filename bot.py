@@ -79,14 +79,21 @@ def get_updates(token, update_id=-1):
     return Update(res,token)
 
 
+
+
 def work(update_id, token):
     Updates = get_updates(token, update_id)
     for i in Updates.message_mas:
         i.choose_ans()
     return Updates.updates_id
-    
+
+
+
 def send_req(token, method_name,data = None):
    return requests.post(f"https://api.telegram.org/bot{token}/{method_name}",data=data)
+
+
+
 
 
 def set_commands(token):
