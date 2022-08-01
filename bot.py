@@ -4,11 +4,9 @@ from setuptools import Command
 
 
 
-'''
-available commands: /start, /help, /info
+# available commands: /start, /help, /info
 
 
-'''
 
 
 

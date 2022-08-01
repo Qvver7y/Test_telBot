@@ -1,13 +1,13 @@
 from os import access
-from re import L
 import sys
-#from tkinter import W
-from datetime import time, datetime
+import pandas as pd
+from datetime import time, datetime, date
 import time as t
 import requests
 
 class vk_objective:
     def __init__(self, id, Time, delta, token ):  # delta - time between 2 verifacations
+        self.dict_ex = {}
         self.id = id
         Time = Time.split(':')
         self.Time = time(int(Time[0]),int(Time[1]) )       
@@ -29,11 +29,51 @@ class vk_objective:
                 return "C" # Computer
         else:
             return "E" # error
+    def WriteToExcel(self, dict_time, dict_status,file_name, dte):
+        try:
+            xl = pd.read_excel(file_name, sheet_name=0)
+        except:
+            dict = {dte:dict_time, f"Status{dte}": dict_status}
+            xl = pd.DataFrame(data=dict)
+            xl.to_excel(file_name)
+        xl = xl.to_dict()
+        if(dte in xl.keys):
+            max_num = int(xl[dte].keys[-1]) + 1
+            for i in range(0,len(dict)):
+                xl[dte][i + max_num] = dict_time[i]
+                xl[f"Status{dte}"][i + max_num] = dict_status[i]            
+        else:
+            xl[dte] = dict_time
+            xl[f"Status{dte}"] = dict_status
+        xl = pd.DataFrame(data = xl)
+        xl.to_excel(file_name, index=0)
+
+            
     def send_req(self, method_name, data = None):
         data["access_token"] = self.token
         data["v"] = 5.131
        # data = {"PARAM" : data1, "access_token" : self.token, "v" : 5.131}
         return requests.post(f"https://api.vk.com/method/{method_name}",data=data).json()
+    def waitDelt(self):
+        t.sleep(self.delta)
+    def making_dict(self):
+        if(len(self.dict_ex) == 0):
+            self.dict_ex[date.today()] = {}
+            self.dict_ex[f"Status{date.today()}"] = {}
+        status = self.checkOnline()
+        tme =  datetime.now().strftime("%H:%M") 
+        dte = date.today()
+        if(dte == self.dict_ex.keys[0] and len(self.dict_ex.keys[0]) != 0):
+            self.dict_ex[dte][len(self.dict_ex[dte])] = tme
+            self.dict_ex[f"Status{dte}"][len(self.dict_ex[f"Status{dte}"])] = status
+        elif(dte != self.dict_ex.keys[0] and len(self.dict_ex.keys[0]) != 0):
+            self.WriteToExcel(self.dict_ex[self.dict_ex.keys[0]],self.dict_ex[self.dict_ex.keys[1]], "report.xlsx",self.dict_ex.keys[0])
+            self.dict_ex[dte] = {}
+            self.dict_ex[f"Status{dte}"] = {}
+            self.dict_ex[dte][len(self.dict_ex[dte])] = tme
+            self.dict_ex[f"Status{dte}"][len(self.dict_ex[f"Status{dte}"])] = status
+            
+    
 
 
 def get_curTime():
